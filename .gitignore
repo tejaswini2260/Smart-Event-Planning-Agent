@@ -1,0 +1,6 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+event_planner.db
+.env
