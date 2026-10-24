@@ -220,49 +220,7 @@ user; English only.
 **Future work:** let the LLM propose plan revisions that the QA agent re-checks in a loop; larger or real
 vendor-approved knowledge bases; PDF export; multi-user accounts; calendar reminders; evaluation of retrieval quality.
 
----
 
-## 10. Viva questions and answers
-
-**Q1. Why is this a multi-agent system and not just a chatbot?**
-Seven classes with separate responsibilities exchange structured `AgentResult` objects under an orchestrator. Most
-agents run deterministic code and tools (budget utilities, SQLite), and only one calls the LLM.
-
-**Q2. Is it fully autonomous?**
-No. The agent order and routing decisions are fixed Python rules (R1-R6). It shows planning, retrieval, tool use and
-conditional routing, but it does not re-plan on its own. I state this limitation openly.
-
-**Q3. What is RAG and why use it?**
-Retrieval-Augmented Generation retrieves relevant documents first and gives them to the LLM, so answers are grounded
-in the knowledge base instead of only the model's memory.
-
-**Q4. What are embeddings?**
-Numeric vectors that represent the meaning of text. Similar meanings give vectors pointing in similar directions.
-
-**Q5. How does cosine similarity work?**
-It measures the angle between two vectors: `cos = (A . B) / (|A| |B|)`. A value near 1 means very similar. I implement it with NumPy.
-
-**Q6. Why not let the LLM calculate the budget?**
-LLMs make arithmetic mistakes and are not reproducible. Budget and capacity checks are critical constraints, so Python
-computes them. The allocations always add up exactly because of a largest-remainder rounding method.
-
-**Q7. What does the QA agent do that the other agents do not?**
-It independently recomputes the key checks (budget sum, capacity, catering need) instead of trusting the earlier
-agents, and it also inspects the generated text for missing sections, booking claims and guest-count contradictions.
-
-**Q8. What happens if guests exceed venue capacity?**
-The Venue agent returns FAILED with suggestions, the orchestrator still drafts a flagged plan, QA fails the capacity
-check, and the final status is NOT_VALIDATED.
-
-**Q9. What happens if Ollama is not running?**
-Embedding errors trigger a keyword-retrieval fallback and generation errors trigger a deterministic fallback plan.
-The app shows readable messages and the trace records the warnings.
-
-**Q10. Why SQLite and parameterized queries?**
-SQLite is built into Python and needs no server. `?` placeholders prevent SQL injection and handle special characters safely.
-
-**Q11. How are tests run without a model?**
-A `FakeClient` mocks `embed()` and `generate()`, so the logic is tested quickly and reproducibly.
 
 **Q12. What are the ethical or practical limits?**
 Prices are illustrative estimates and the system does not book or pay for anything. A human must verify all details
